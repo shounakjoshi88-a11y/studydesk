@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Signing material. The release key lives only on the build machine.
+*.jks
+*.keystore
+android/keystore.properties
+
+# Local dev lab: personal timetable samples, portal probes, PC companion,
+# RE scratch work, screenshots, and internal notes. Not part of the app.
+ocr-lab
+bridge
+pc-app
+_rea
+.shots
+docs
+TASKS.md
+premium-video-player SKILL.md
+eng.traineddata
+juno-login-student-v3.svg
+student_lying_on_floor_pointing_at_form.svg

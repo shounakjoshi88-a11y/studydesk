@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">StudyDesk</string>
+    <string name="title_activity_main">StudyDesk</string>
+    <string name="package_name">com.shounak.studydesk</string>
+    <string name="custom_url_scheme">com.shounak.studydesk</string>
+</resources>

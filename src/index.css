@@ -1,0 +1,734 @@
+@import "tailwindcss";
+
+/* ── Type ──────────────────────────────────────────────────────────
+   IBM Plex Sans. A humanist grotesque: the flat-topped a and the narrow
+   apertures give it a printed, editorial feel, but it still holds up at
+   12px on a phone — which matters here because almost every number in this
+   app is a small one. Deliberately not Inter and not Roboto; Roboto was
+   what system-ui resolved to, and a screen full of attendance figures
+   should not look like a settings app.
+
+   IBM Plex Mono stays for code, and its tabular figures are what the .tnum
+   utility leans on. Weights are 400/500/600 only — hierarchy comes from
+   size and contrast, not from bolding things. */
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/plex-sans-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/plex-sans-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/plex-sans-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/plex-mono-400.woff2") format("woff2");
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink-1: var(--ink-1);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-safe: var(--att-safe);
+  --color-safe-text: var(--att-safe-text);
+  --color-caution: var(--att-caution);
+  --color-caution-text: var(--att-caution-text);
+  --color-risk: var(--att-risk);
+  --color-risk-text: var(--att-risk-text);
+  --color-critical: var(--att-critical);
+  --color-critical-text: var(--att-critical-text);
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* Display sizes get negative tracking so a large title reads as one
+     solid shape rather than a row of separate letters. */
+  --tracking-display: -0.021em;
+  --tracking-tight: -0.012em;
+  --radius-card: 12px;
+  --dur-1: 90ms;
+  --dur-2: 160ms;
+  --dur-3: 260ms;
+  --dur-4: 520ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-io: cubic-bezier(0.45, 0, 0.15, 1);
+  --ease-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* ── Inkstone Ledger ──────────────────────────────────────────────
+   A dark, low-chroma "night campus" palette. Surfaces step in
+   lightness (not hue) so depth reads without colour noise; the only
+   saturated colour in the app is the brand indigo plus the attendance
+   ramp, which is the thing students actually scan for. */
+:root,
+.dark {
+  color-scheme: dark;
+
+  /* ── Layers ───────────────────────────────────────────────────────
+     The canvas sits right down at the bottom of the range because that is
+     what the screen should feel like: ink, not a dark grey card. Everything
+     above it keeps a real step, because a near-black canvas with no
+     separation between it and the first surface has no depth at all — the
+     dock, the sheets and the search field all need something to sit on.
+
+     Deliberately not #000. On an OLED that is a genuinely different pixel
+     state, and it smears on scroll. #040507 reads as black and stays a
+     colour the compositor can move. */
+  --background: #040507;
+  --surface-1: #0d1015;
+  --surface-2: #14181f;
+  --surface-3: #1c212a;
+  --card: #0d1015;
+  --muted: #14181f;
+  --input: #14181f;
+  --accent: #1c212a;
+
+  /* lines — low enough to stay quiet, high enough to survive the canvas */
+  --line: #1b2028;
+  --line-strong: #2b3340;
+  --border: #1b2028;
+
+  /* ink — 3 steps only, all ≥ 4.5:1 on --surface-1 */
+  --ink-1: #eef1f6;   /* 15.8:1 */
+  --ink-2: #a3adbd;   /*  7.1:1 */
+  --ink-3: #6b7686;   /*  4.6:1 */
+  --foreground: var(--ink-1);
+  --muted-foreground: var(--ink-2);
+
+  /* ── Brand ──────────────────────────────────────────────────────
+     The accent is deliberately low-chroma. Saturated colour in this app
+     means one thing only: attendance status. A loud accent would compete
+     with the one number the student opens the app to check, so chrome
+     stays steel-blue and the primary action is paper-white. */
+  --brand: #8fa3c4;         /* steel blue, chroma deliberately low */
+  --brand-soft: #161d29;
+  --brand-ink: #a9bbd6;
+  --primary: var(--brand);
+  --primary-foreground: #040507;
+  --ring: var(--brand);
+
+  /* Paper: the one bright element, used for the single primary action
+     on a screen. Ink on paper — the register this app is pretending to be. */
+  --paper: #f2f0ea;
+  --paper-ink: #040507;
+
+  /* ── Attendance ramp ───────────────────────────────────────────
+     Ordered teal → amber → orange → red. Teal-vs-orange is the
+     canonical deuteranopia/protanopia-safe axis, and every step also
+     differs in lightness, so the ramp survives greyscale and all
+     common CVD types. Colour is never the only signal: each band
+     ships a label and a glyph. */
+  --att-safe: #2dd4bf;      /* ≥85%  teal    */
+  --att-safe-text: #5eead4;
+  --att-caution: #fbbf24;   /* 75–85 amber  */
+  --att-caution-text: #fcd34d;
+  --att-risk: #fb923c;      /* 60–75 orange  */
+  --att-risk-text: #fdba74;
+  --att-critical: #f87171;  /* <60   red     */
+  --att-critical-text: #fca5a5;
+  --destructive: var(--att-critical);
+
+  /* sequential ramp — for charts and heat cells. Sits above the canvas, so
+     it starts a step higher than nothing rather than at nothing. */
+  --seq-100: #0f131a;
+  --seq-300: #171d27;
+  --seq-500: #202835;
+  --seq-700: #2b3543;
+  --seq-900: #384456;
+
+  /* ── Illustration figures ───────────────────────────────────────
+     A closed set, so a drawn scene can never invent a colour. This is a
+     line-art sticker: a near-black edge, a pale core, and exactly one
+     accent. It sits straight on the dark sheet with no panel of its own —
+     the drawing is pale, so it already reads against the background, and
+     the near-black edges keep doing their real job of separating one pale
+     shape from the next. The accent is our own --brand, so the picture and
+     the app are the same world rather than artwork dropped into a product. */
+  --fig-lift: #f4f6fa;
+  --fig-shade: #dbe0ec;
+  --fig-line: #090c10;
+  /* The hair's inner curls get their own value. On the original light
+     ground they were near-black and read as depth; against this dark
+     sheet a near-black curl disappears into the background and the hair
+     flattens into a pale blob. This slate reads as a shadow on the pale
+     face and as a visible curl against the sheet. */
+  --fig-hair: #4c5666;
+  --fig-ground: #333c49;
+  --fig-blush: #e7a9a9;
+
+  /* The gauge's woven bed. Its own value because the mesh has to sit a step
+     above the hairline colour or the weave vanishes at phone sizes, and a
+     step below --ink-3 or it competes with the arc it is behind. */
+  --mesh-line: #3b4553;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "cv11", "ss01";
+  }
+  /* Tabular figures everywhere numbers can change in place, so a rolling
+     counter never reflows its neighbours. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  /* Display type: the large titles only. Tracking tightens as size grows,
+     which is what makes a big sans read as editorial rather than as a
+     default. Body copy is left at the font's own spacing. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: var(--tracking-display);
+    line-height: 1.15;
+  }
+  h4,
+  h5,
+  h6 {
+    letter-spacing: var(--tracking-tight);
+  }
+}
+
+/* ── Motion ───────────────────────────────────────────────────────
+   One orchestrated moment (the attendance read). Everything else is
+   action-feedback in the 90–260ms band. */
+@keyframes sd-press {
+  from { transform: scale(1); }
+  to { transform: scale(0.97); }
+}
+@keyframes sd-card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sd-pop {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+@keyframes sd-draw {
+  from { stroke-dashoffset: var(--dash, 100); }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes sd-pulse-ring {
+  0% { r: 4; opacity: 1; }
+  100% { r: 9; opacity: 0; }
+}
+@keyframes sd-scan {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(var(--scan-travel, 120px)); opacity: 0; }
+}
+@keyframes sd-rail-in {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes sd-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+/* The class happening right now gets a slow, friendly halo. It is the only
+   looping element in the app besides the mascots' blink, and it only runs
+   while a class is genuinely in progress. */
+@keyframes sd-live-halo {
+  0%, 100% { opacity: 0.22; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.55); }
+}
+.sd-live-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--att-safe);
+  transform-origin: center;
+  animation: sd-live-halo 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Blink: the one loop a mascot is allowed. Long hold, fast close, no
+   return-to-idle jitter — reads as alive rather than as a loop. */
+@keyframes sd-blink {
+  0%, 84%, 100% { transform: scaleY(1); }
+  90%, 94% { transform: scaleY(0.08); }
+}
+
+.sd-press { animation: sd-press var(--dur-1) var(--ease-out) both; }
+.sd-card-in { animation: sd-card-in var(--dur-3) var(--ease-out) both; }
+.sd-pop { animation: sd-pop 260ms var(--ease-back) both; }
+.sd-draw { animation: sd-draw var(--draw-dur, 700ms) var(--ease-out) both; }
+.sd-rail-in { animation: sd-rail-in var(--dur-3) var(--ease-out) both; transform-origin: center; }
+.sd-scan { animation: sd-scan 1.2s var(--ease-io) infinite; }
+
+/* Bridge/juno status: a pulse ring only while actually working. Idle is a
+   static dot — motion must mean something. */
+.sd-live-dot { position: relative; }
+.sd-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: currentColor;
+  animation: sd-pulse-ring 1.4s var(--ease-out) infinite;
+}
+
+.sd-skeleton {
+  background: var(--surface-2);
+  animation: sd-breathe 1.6s ease-in-out infinite;
+}
+
+/* Mascot eye blink. Stagger left/right with inline animation-delay. */
+.sd-blink {
+  animation: sd-blink var(--blink-dur, 2.2s) var(--ease-io) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Press feedback for elements that also carry .sd-card-in. sd-card-in
+   fills forwards on `transform`, which would swallow a :active transform —
+   so the press uses the independent `scale` property instead and the two
+   compose. */
+.sd-tap {
+  transition: scale var(--dur-1) var(--ease-out);
+}
+.sd-tap:active { scale: 0.98; }
+
+/* Icon-only controls. The glyph stays the size it was drawn; the tap target
+   is the 44px floor every row and dock item in the app already keeps. Under
+   it by default they were 36–38px — fine for a mouse, thin for a thumb.
+   Adjacent buttons space out to 44px pitch with it, which is the same rhythm
+   Android's own chrome uses. */
+.sd-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+}
+
+/* Companion to sd-draw for flat illustration fills: the outline draws on,
+   the wash fades up underneath it. Two classes, two properties, no conflict. */
+@keyframes sd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sd-fade-in { animation: sd-fade-in var(--dur-3) var(--ease-out) both; }
+
+/* The Files drawer — a panel that slides in from the left over a scrim.
+   Unlike the bottom sheets, nothing drags this one, so a plain entrance
+   keyframe cannot fight a gesture library for the transform. The panel
+   travels its full width, because that is what tells the thumb this layer
+   came from the edge; the rows trail it in 55ms apart, so the menu reads
+   as opening rather than as having appeared. One entrance, every time. */
+@keyframes sd-drawer-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.sd-drawer-in { animation: sd-drawer-in var(--dur-3) var(--ease-out) both; }
+
+@keyframes sd-drawer-row {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+.sd-drawer-row { animation: sd-drawer-row 240ms var(--ease-out) both; }
+
+/* The home screen's recent list: the same idea at a smaller scale — each
+   row settles up 6px into place, once per mount, while the list loads. */
+@keyframes sd-row-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.sd-row-in { animation: sd-row-in 280ms var(--ease-out) both; }
+
+/* ── Juno sign-in sheet ────────────────────────────────────────────
+   Overlay elevation level 3: scrim, then a 28px top radius, then the
+   grabber. Dismiss by dragging down, by tap-outside, or with the X.
+
+   No animation on .sd-sheet or .sd-sheet-scrim, and that is deliberate.
+   Both are driven by framer — the scrim's opacity and the sheet's
+   transform — and a CSS animation with fill-mode `both` outranks an
+   inline style in the cascade, so an entrance keyframe here would pin
+   `transform: none` forever and silently swallow every drag. The entrance
+   is animated in JS for the same reason. */
+.sd-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* The dim itself. Its opacity is driven from JS and starts at 1, so
+     this alpha is the whole story — do not also scale it down in the
+     transform and expect the card to keep its contrast. */
+  background: rgba(0, 0, 0, 0.74);
+}
+.sd-sheet {
+  position: relative;
+  /* The topmost elevation in the app, and deliberately the darkest
+     surface in it. Everything sitting on this card is pale — the figure,
+     the labels, the primary button — so a near-black panel is what buys
+     them their contrast. The hairline above it is what separates the card
+     from the scrimmed page, because at this darkness the two would
+     otherwise be the same value. */
+  background: #08090d;
+  border-top: 1px solid var(--line-strong);
+  border-radius: 28px 28px 0 0;
+  padding: 12px 24px 32px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  max-height: 92%;
+  overflow-y: auto;
+  /* Stops the WebView treating a downward drag as pull-to-refresh. */
+  overscroll-behavior: contain;
+}
+.sd-sheet-grab {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 20px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+
+/* ── Portal glyph ──────────────────────────────────────────────────
+   The entrance is an assemble, not a line draw: the ledge arrives, then
+   the legs, the sweater, the head, the arm, the finger. Nothing is
+   traced — parts just turn up and stay put, which is how the reference
+   illustrations behave. `translate` and `rotate` are used as independent
+   properties so they compose with an SVG `transform` attribute instead
+   of silently replacing it. */
+.pg { overflow: visible; }
+
+@keyframes sd-glyph-in {
+  from { opacity: 0; translate: 0 5px; }
+  to { opacity: 1; translate: 0 0; }
+}
+.pg-in { animation: sd-glyph-in 460ms var(--ease-out) both; }
+.pg-l1 { animation-delay: 0ms; }
+.pg-l2 { animation-delay: 70ms; }
+.pg-l3 { animation-delay: 130ms; }
+.pg-l4 { animation-delay: 190ms; }
+.pg-l5 { animation-delay: 250ms; }
+.pg-l6 { animation-delay: 310ms; }
+.pg-l7 { animation-delay: 380ms; }
+
+/* Idle: the arm keeps indicating. One slow loop, and it pivots at the
+   shoulder so the whole limb swings as one piece — see the note in
+   PortalGlyph about why the hand is not animated on its own. */
+@keyframes sd-point {
+  0%, 100% { rotate: 0deg; }
+  50% { rotate: 3.5deg; }
+}
+.pg-idle .pg-arm { animation: sd-point 2.6s var(--ease-io) 1.6s infinite; }
+
+/* Working: the pointing quickens and the accent dashes run off the end
+   of the fingertip into the field below. */
+@keyframes sd-point-fast {
+  0%, 100% { rotate: 0deg; }
+  50% { rotate: 6deg; }
+}
+@keyframes sd-dash {
+  0% { opacity: 0; translate: 0 0; }
+  35% { opacity: 1; }
+  100% { opacity: 0; translate: 7px 9px; }
+}
+.pg-working .pg-arm { animation: sd-point-fast 0.9s var(--ease-io) infinite; }
+.pg-working .pg-dash { animation: sd-dash 0.9s var(--ease-out) infinite; }
+.pg-working .pg-dash:nth-of-type(2) { animation-delay: 0.12s; }
+.pg-working .pg-dash:nth-of-type(3) { animation-delay: 0.24s; }
+
+@keyframes sd-glyph-tick {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.pg-tick {
+  --dash: 1;
+  stroke-dasharray: 1;
+  animation: sd-glyph-tick 520ms var(--ease-out) both;
+}
+
+/* Error: two nudges then still. Nothing turns red — the message under
+   the button says what went wrong, and the figure only says "no". */
+@keyframes sd-glyph-nudge {
+  0%, 100% { translate: 0 0; }
+  18% { translate: -4px 0; }
+  38% { translate: 4px 0; }
+  58% { translate: -2px 0; }
+  78% { translate: 0 0; }
+}
+.pg-error .pg-figure { animation: sd-glyph-nudge 340ms var(--ease-out) both; }
+
+/* Checkbox. The native control renders a light filled box on this dark
+   surface, which reads as "checked" when it is not. Drawn by hand so the
+   unchecked state is unmistakably empty and the checked state carries the
+   brand hue with a real tick. `.pg-check-hit` is the positioned wrapper, so
+   the invisible input can sit exactly on the drawn box — that keeps the tap
+   target, the focus ring and the screen-reader name working, and lets more
+   than one screen use the same control. */
+.pg-check-hit { position: relative; display: flex; width: 22px; height: 22px; flex: none; }
+.pg-check-input {
+  position: absolute;
+  inset: 0;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.pg-check {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1.5px solid var(--line-strong);
+  color: var(--paper-ink);
+  transition: background var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.pg-check-input:checked + .pg-check {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+/* The card is one step up now, so the remember row has to step up again or
+   it disappears into the panel it sits on. */
+.pg-check-row { background: var(--surface-3); }
+.pg-check-input:focus-visible + .pg-check {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* The day and the time are the same three columns at the same widths, so the
+   pair reads as one 2×3 grid instead of two mismatched rows. Columns are
+   proportional rather than fixed, so the block fills the form width instead of
+   leaving a dead margin beside it. */
+.sdf-reveal { animation: sdf-open 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes sdf-open {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+.sdf-row { display: flex; align-items: center; }
+.sdf-sep {
+  width: 12px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sdf-colon {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+.sdf {
+  perspective: 620px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.sdf-card {
+  position: relative;
+  height: 56px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+/* The fold. Lit above the seam, shadowed below, with a hard line between —
+   this is what makes a flat rectangle read as a hinged card. */
+.sdf-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0 48%,
+    rgba(0, 0, 0, 0.38) 49.4% 50.6%,
+    rgba(0, 0, 0, 0.12) 51.6% 100%
+  );
+}
+.sdf-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-1);
+}
+/* Four digits have to sit in the same card, so they set smaller. */
+.sdf-num.is-year { font-size: 22px; }
+.sdf-num.is-text { font-size: 21px; letter-spacing: 0.02em; }
+/* An unset day reads as an empty card rather than as a value. */
+.sdf-num.is-blank { color: var(--ink-3); }
+
+/* The outgoing face lifts away; the new value is already underneath it. */
+.sdf-flip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.sdf-flip.is-up {
+  transform-origin: 50% 100%;
+  animation: sdf-flip-up 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.sdf-flip.is-down {
+  transform-origin: 50% 0%;
+  animation: sdf-flip-down 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes sdf-flip-up {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(-92deg); }
+}
+@keyframes sdf-flip-down {
+  from { transform: rotateX(0deg); }
+  to { transform: rotateX(92deg); }
+}
+
+.sdf-step {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  z-index: 2;
+}
+.sdf-step.is-up { top: 0; }
+.sdf-step.is-down { bottom: 0; }
+.sdf-step:active { color: var(--ink-1); background: rgba(255, 255, 255, 0.05); }
+
+.sdf-chev { width: 13px; height: 13px; }
+
+/* ── Bottom dock ──────────────────────────────────────────────────────────
+   A floating plate rather than a full-bleed bar. Inset on every side it reads
+   as an object sitting on the page instead of a seam cutting it in two, which
+   is the same trick the phone's own launcher uses. Frosted rather than solid
+   so the content sliding underneath stays faintly present. */
+/* One glass treatment, shared. Anything that genuinely floats over scrolling
+   content gets it: the dock, and the small popovers and the source switcher.
+   It is deliberately not a general surface fill - glass on something that sits
+   over nothing is the other half of the same mistake as a shadow on a flat
+   list item. */
+.sd-glass {
+  background: color-mix(in srgb, var(--surface-1) 74%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+}
+.sd-dock {
+  /* The dock inherits the shared treatment and supplies only its own radius:
+     one glass recipe, radius by role. */
+  border-radius: 24px;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .sd-glass {
+    background: var(--surface-1);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-press, .sd-card-in, .sd-pop, .sd-draw, .sd-rail-in, .sd-scan,
+  .sd-live-dot::after, .sd-skeleton, .sd-blink, .sd-fade-in, .sd-live-halo,
+  .sd-drawer-in, .sd-drawer-row, .sd-row-in {
+    animation: none !important;
+  }
+  .sd-tap { transition: none !important; scale: 1 !important; }
+  .sd-draw { stroke-dashoffset: 0 !important; }
+  .sdf-flip.is-up, .sdf-flip.is-down { animation: none !important; }
+  .sdf-reveal { animation: none !important; }
+
+  /* The scene's assembled frame is already finished, so dropping the
+     entrance and the loops leaves something that reads correctly. */
+  .pg-in, .pg-tick, .pg-arm, .pg-dash,
+  .pg-idle .pg-arm, .pg-error .pg-figure {
+    animation: none !important;
+  }
+  .pg-tick { stroke-dashoffset: 0 !important; }
+  .pg-check { transition: none !important; }
+}
+
+/* ── markdown-body essentials (used by MessageRenderer) ── */
+.markdown-body h1 { font-size: 1.35rem; font-weight: 700; margin: 0.9em 0 0.5em; line-height: 1.3; }
+.markdown-body h2 { font-size: 1.15rem; font-weight: 700; margin: 0.9em 0 0.45em; line-height: 1.35; }
+.markdown-body h3 { font-size: 1.02rem; font-weight: 600; margin: 0.8em 0 0.4em; }
+.markdown-body h4 { font-size: 0.95rem; font-weight: 600; margin: 0.7em 0 0.35em; }
+.markdown-body p { margin: 0.5em 0; }
+.markdown-body ul, .markdown-body ol { padding-left: 1.4em; margin: 0.5em 0; }
+.markdown-body ul { list-style: disc; }
+.markdown-body ol { list-style: decimal; }
+.markdown-body li { margin: 0.25em 0; }
+.markdown-body table { width: 100%; border-collapse: collapse; margin: 0.7em 0; font-size: 0.82rem; display: block; overflow-x: auto; }
+.markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 0.4em 0.6em; text-align: left; }
+.markdown-body th { background: var(--muted); font-weight: 600; }
+.markdown-body pre { background: var(--background); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.7em; overflow-x: auto; margin: 0.6em 0; font-size: 0.78rem; }
+.markdown-body code { font-family: var(--font-mono); }
+.markdown-body p code, .markdown-body li code, .markdown-body td code { background: rgba(123,140,255,0.14); padding: 0.1em 0.35em; border-radius: 0.3rem; font-size: 0.82em; }
+.markdown-body blockquote { border-left: 3px solid var(--primary); padding-left: 0.8em; margin: 0.6em 0; color: var(--muted-foreground); }
+.markdown-body a { color: var(--brand-ink); text-decoration: underline; }
+.markdown-body hr { border-color: var(--border); margin: 1em 0; }
+.markdown-body img { max-width: 100%; border-radius: 0.5rem; }
+.inline-code { font-family: var(--font-mono); background: rgba(123,140,255,0.14); padding: 0.1em 0.35em; border-radius: 0.3rem; font-size: 0.85em; }
