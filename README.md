@@ -114,6 +114,11 @@ The details that made it survive real photos:
   Mermaid, KaTeX, abcjs, smiles-drawer
 - IBM Plex Sans and Mono, with hand made pixel art empty states
 
+## Say hi
+
+<a href="https://www.youtube.com/@Badass069"><img src="assets/youtube.svg" width="18" height="18" alt=""> My YouTube channel</a>, where I write up the parts of this app that were harder than they
+looked.
+
 ## Notes
 
 - This is a personal project and not an official app of any college or portal. If the portal sign
