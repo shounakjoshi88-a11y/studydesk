@@ -1,5 +1,7 @@
 # StudyDesk
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 StudyDesk is an Android app I built to run my college life from one place: timetable, attendance,
 notes, files, PDF and image tools, to-dos, and a study chat that can lean on my own PC. It is
 offline first. Almost everything runs on the phone, with no account, no ads, and no analytics.
@@ -124,3 +126,9 @@ looked.
 - This is a personal project and not an official app of any college or portal. If the portal sign
   in is useful to you, use your own account and check your institution's rules first.
 - The PC companion bridge and the wiring for the portal sign in are not part of this repository.
+
+---
+
+## License
+
+MIT - see [LICENSE](LICENSE).
